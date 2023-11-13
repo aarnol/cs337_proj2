@@ -47,8 +47,8 @@ def get_recipe_info(url):
 
 if __name__ == '__main__':
     
-    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
-    url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
+    url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
+    # url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
 
     recipe_info = get_recipe_info(url)
 
