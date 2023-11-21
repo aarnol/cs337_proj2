@@ -77,8 +77,8 @@ def anayze_step(step, ingredients_dict):
         step= step.lstrip()
         print(step)
         spacy_tags = pos_tagger(step)
-        for token in spacy_tags:
-            print(f"{token.text}:  {token.dep_}")
+        # for token in spacy_tags:
+        #     print(f"{token.text}:  {token.dep_}")
         tokens = [{'text': token.text, 'pos':token.pos_, 'dep':token.dep_} for token in spacy_tags]
         
 
@@ -86,12 +86,14 @@ def anayze_step(step, ingredients_dict):
         actions = []
         other_info = []
         for token in tokens:
-            if token['dep'] == 'dobj':
-                foods.append(token['text'])
+            if token['pos'] == 'NOUN':
+                if any(True for food in ingredients_dict.keys() if token['text'] in food):
+                    foods.append(token['text'])
+                else:
+                    other_info.append(token['text'])
             elif token['pos'] == 'VERB':
                 actions.append(token['text'])
-            elif token['dep'] == 'iobj':
-                other_info.append(token['text'])
+                
         print(foods)
         print(actions)
         print(other_info)
@@ -106,17 +108,11 @@ def anayze_step(step, ingredients_dict):
         
         
                                 
-def steps_to_sentences(steps):
-    sentences = []
-    for step in steps:
-        step = step.split(".")
-        sentences += step
-    sentences =[s for s in sentences if re.search('[a-zA-Z]', s)]
-    return sentences
+
 if __name__ == '__main__':
     
-    #url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
-    url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
+    url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
+    #url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
 
     recipe_info = get_recipe_info(url)
 
@@ -132,8 +128,6 @@ if __name__ == '__main__':
         print("Parsed ingredients")
         ingredients_dict = get_ingredients(recipe_info)
         print(ingredients_dict)
-        sentences = steps_to_sentences(recipe_info['instructions'])
-        for sentence in sentences:
-            print(anayze_step(sentence, ingredients_dict))
+      
 
         

@@ -11,7 +11,13 @@ pos_tagger = spacy.load("en_core_web_sm")
 nltk.download('punkt')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
-
+def steps_to_sentences(steps):
+    sentences = []
+    for step in steps:
+        step = step.split(".")
+        sentences += step
+    sentences =[s for s in sentences if re.search('[a-zA-Z]', s)]
+    return sentences
 
 def process_instructions(instructions_list, recipe_info):
     processed_instructions = []
@@ -21,6 +27,7 @@ def process_instructions(instructions_list, recipe_info):
 
     #lowercase all the instructions
     instructions_list = [instruction.lower() for instruction in instructions_list]
+    instructions_list = steps_to_sentences(instructions_list)
 
     for step, instruction in enumerate(instructions_list, start=1):
         # For each instruction, create a dictionary that will hold the action, ingredients, and tools
