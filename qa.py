@@ -1,12 +1,19 @@
 from scrape import get_recipe_info
 from process_instructions import process_instructions
+import re
 def parse_question(input_str,last_instr,instr_ptr):
     new_ptr = instr_ptr
+    skip_pattern = r'\bgo to the (\d+)th step\b'
     if("repeat" in input_str):
         pass
     elif("next" in input_str or "continue" in input_str):
         new_ptr = instr_ptr + 1
-    return new_ptr
+    elif(re.search(skip_pattern, input_str)):
+        match = re.search(skip_pattern, input_str).group(1)
+        new_ptr = match
+        print(f"OK, going to step {new_ptr}!")
+
+    return new_ptr, last_instr
     
 
 def session():
@@ -28,8 +35,13 @@ def session():
         else:
             'Please input 1 or 2'
     instr_ptr = 0
+    last_instr = None
     while(True):
-        print()
+        
+        print(f'{instr_ptr+1}: instructions[{instr_ptr}]')
+        input_str = input(":")
+        instr_ptr, last_instr = parse_question(input_str, last_instr, instr_ptr)
+        
     
     
 
