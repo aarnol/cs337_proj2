@@ -1,9 +1,20 @@
 from scrape import get_recipe_info
 from process_instructions import process_instructions
 import re
-def parse_question(input_str,last_instr,instr_ptr):
-    new_ptr = instr_ptr
+def google_search_query(query,youtube = False):
+    
+    query = query.replace(' ', '+')
+    if(youtube):
+        search_url = f'https://www.youtube.com/results?search_query={query}'
+    else:
+        search_url = f'https://www.google.com/search?q={query}'
+    return search_url
+
+def parse_question(input_str,instr_ptr, last_input):
+    output = None
     skip_pattern = r'\bgo to the (\d+)th step\b'
+    input_str = input_str.lower()
+    #navigation
     if("repeat" in input_str):
         pass
     elif("next" in input_str or "continue" in input_str):
@@ -11,9 +22,16 @@ def parse_question(input_str,last_instr,instr_ptr):
     elif(re.search(skip_pattern, input_str)):
         match = re.search(skip_pattern, input_str).group(1)
         new_ptr = match
-        print(f"OK, going to step {new_ptr}!")
-
-    return new_ptr, last_instr
+    #vague questions
+    elif("what is that" in input_str):
+        pass
+    elif("what is" in input_str):
+        print("I'm not sure, but here is a google link that might help.")
+        output = google_search_query(input_str)
+    elif("how do" in input_str):
+        print("I'm not sure, but here is a google link that might help.")
+        output = google_search_query(input_str,youtube=True)
+    return new_ptr, input_str, output
     
 
 def session():
@@ -37,11 +55,10 @@ def session():
     instr_ptr = 0
     last_instr = None
     while(True):
-        
         print(f'{instr_ptr+1}: instructions[{instr_ptr}]')
         input_str = input(":")
-        instr_ptr, last_instr = parse_question(input_str, last_instr, instr_ptr)
-        
+        instr_ptr, last_instr, output = parse_question(input_str, last_instr, instr_ptr)
+
     
     
 

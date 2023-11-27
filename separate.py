@@ -9,6 +9,7 @@ pos_tagger = spacy.load("en_core_web_sm")
 nltk.download('punkt')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
+import lists
 # nltk.download('averaged_perceptron_tagger')
 
 
@@ -91,9 +92,9 @@ def anayze_step(step, ingredients_dict):
                     foods.append(token['text'])
                 else:
                     other_info.append(token['text'])
-            elif token['pos'] == 'VERB':
+            elif token['pos'] == 'VERB' and len(token['text']) > 1:
                 actions.append(token['text'])
-                
+        
         print(foods)
         print(actions)
         print(other_info)

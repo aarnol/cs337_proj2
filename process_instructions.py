@@ -1,6 +1,6 @@
 import re
 import os
-
+import lists
 import nltk
 from nltk import pos_tag, word_tokenize
 import spacy
@@ -44,22 +44,30 @@ def process_instructions(instructions_list, recipe_info):
         # Get verbs
         words = word_tokenize(instruction)
         pos_tags = pos_tag(words)
-        actions = [word for word, pos in pos_tags if pos.startswith('VB')]
+        actions = [word for word, pos in pos_tags if pos.startswith('VB') and len(word) > 1]
         current_instruction['action'] = actions
-
+        if(len(current_instruction['action']) < 1):
+            possible_actions = [verb for verb in lists.cooking_verbs if re.search(verb, instruction, re.IGNORECASE)]
+            print(f'actions = {possible_actions}')
+            if(len(possible_actions) > 0):
+                current_instruction['action'] +=possible_actions
         # Check if the ingredient is in the ingredients dictionary, if it is, add it to the ingredients list.
         for ingredient in ingredients_dict:
             if ingredient in instruction:
                 current_instruction['ingredients'].append(ingredient)
 
+        for tool in lists.cooking_tools + lists.cooking_places:
+            if tool in instruction:
+                current_instruction['tools'].append(tool)
+                
         processed_instructions.append(current_instruction)
 
     return processed_instructions
 
 
 if __name__ == '__main__':
-    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
-    url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
+    url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572'
+    #url = "https://www.foodnetwork.com/recipes/food-network-kitchen/yogurt-marinated-grilled-chicken-shawarma-9961050"
 
     recipe_info = get_recipe_info(url)
 
