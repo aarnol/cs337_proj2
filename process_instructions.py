@@ -35,12 +35,18 @@ def process_instructions(instructions_list, recipe_info):
             'instruction_step': step,
             'action': [],
             'ingredients': [],
-            'tools': []
+            'tools': [],
+            'temp': None,
+            'text' : instruction
         }
 
         # Remove punctuation
         instruction = re.sub(r'[^\w\s/.,]', ' ', instruction)
-
+        #get temp
+        temp_pattern = r'\b(\d+(\.\d+)?) degrees (F|C)\b'
+        match = re.search(temp_pattern, instruction, re.IGNORECASE)
+        if match:
+            current_instruction['temp'] = str(match.group(1)) +match.group(3)
         # Get verbs
         words = word_tokenize(instruction)
         pos_tags = pos_tag(words)

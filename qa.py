@@ -12,8 +12,9 @@ def google_search_query(query,youtube = False):
 
 def parse_question(input_str,instr_ptr, last_input):
     output = None
-    skip_pattern = r'\bgo to the (\d+)th step\b'
+    skip_pattern = r'\bgo to step (\d+)\b'
     input_str = input_str.lower()
+    new_ptr = instr_ptr
     #navigation
     if("repeat" in input_str):
         pass
@@ -21,7 +22,7 @@ def parse_question(input_str,instr_ptr, last_input):
         new_ptr = instr_ptr + 1
     elif(re.search(skip_pattern, input_str)):
         match = re.search(skip_pattern, input_str).group(1)
-        new_ptr = match
+        new_ptr = int(match) - 1
     #vague questions
     elif("what is that" in input_str):
         pass
@@ -45,20 +46,22 @@ def session():
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
         choice = input('[1] Instuctions or [2] Recipes: ')
-        if(choice is '1'):
+        if(choice == '1'):
             print("Let\' get started with the recipe.")
             break
-        elif(choice is '2'):
+        elif(choice == '2'):
             print(ingredients)
         else:
             'Please input 1 or 2'
     instr_ptr = 0
     last_instr = None
     while(True):
-        print(f'{instr_ptr+1}: instructions[{instr_ptr}]')
+        print(f'{instr_ptr+1}: {instructions[instr_ptr]['text']}')
         input_str = input(":")
-        instr_ptr, last_instr, output = parse_question(input_str, last_instr, instr_ptr)
+        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr)
 
     
     
+if __name__ == "__main__":
+    session()
 
