@@ -23,6 +23,9 @@ def parse_question(input_str,instr_ptr, last_input):
     elif(re.search(skip_pattern, input_str)):
         match = re.search(skip_pattern, input_str).group(1)
         new_ptr = int(match) - 1
+    #Specific questions about the recipe
+    
+
     #vague questions
     elif("what is that" in input_str):
         pass
