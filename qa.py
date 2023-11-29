@@ -15,7 +15,10 @@ def google_search_query(query,youtube = False):
         search_url = f'https://www.google.com/search?q={query}'
     return search_url
 
-def parse_question(input_str,instr_ptr, last_input, instruction=None):
+def parse_question(input_str,instr_ptr, last_input, instruction_full=None):
+    instruction = instruction['text']
+    items = instruction['ingredients'] + instruction['tools']
+    actions = instruction['action']
     output = None
     skip_pattern = r'\bgo to step (\d+)\b'
     skip_pattern = r'\bto step (\d+)\b' # so that it would also take patter "take me to" not only "go to"
@@ -98,7 +101,36 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
 
     #vague questions
     elif("what is that" in input_str):
-        pass
+        print("I'm not entirely sure what you mean, but I'll try my best.")
+        found = False
+        if(items != None):
+            for item in items:
+                ans = input(f'Are you asking about the {item}?')
+                if('y' in ans.lower()):
+                    print('Here is a link that might help!')
+                    output = google_search_query(f'what is {item}')
+                    found = True
+                else:
+                    continue
+            if not found:
+                output = 'I can not figure out what you mean, please be more specific'
+    elif("how" in input_str and "do that" in input_str):
+        print("I'm not entirely sure what you mean, but I'll try my best.")
+        found = False
+        if(actions != None):
+            for action in actions:
+                ans = input(f'Are you asking about how to {action}?')
+                if('y' in ans.lower()):
+                    print('Here is a link that might help!')
+                    output = google_search_query(f'how do I {action} for cooking', True)
+                    found = True
+                else:
+                    continue
+            if not found:
+                output = 'I can not figure out what you mean, please be more specific'
+
+
+
     elif("what is" in input_str):
         print("I'm not sure, but here is a google link that might help.")
         output = google_search_query(input_str)
@@ -123,23 +155,21 @@ def session():
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
         choice = input('[1] Recipes or [2] Ingredients: ')
-        if(choice == '1'):
+        if('ingred' not in choice):
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             break
-        elif(choice == '2'):
+        else:
             for element in ingredients:
                 print(f'✦  {element}')
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             # print(ingredients)
             break
-        else:
-            'Please input 1 or 2'
     instr_ptr = 0
     last_instr = None
     while(True):
         print(f'{instr_ptr+1}: {instructions[instr_ptr]["text"]}')
         input_str = input(":")
-        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, instructions[instr_ptr]["text"])
+        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, instructions[instr_ptr])
         print(f'{output}')
     
     
