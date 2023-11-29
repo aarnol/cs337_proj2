@@ -1,6 +1,8 @@
 from scrape import get_recipe_info
 from process_instructions import process_instructions
 import re
+from fractions import Fraction
+
 from lists import ingredients as presaved_ingredients
 
 
@@ -29,15 +31,72 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
     elif(re.search(skip_pattern, input_str)):
         match = re.search(skip_pattern, input_str).group(1)
         new_ptr = int(match) - 1
-    #Specific questions about the recipe
-    # ingredients in this step
-    # what is it in F to C; inch to cm; etc
+    #Specific questions about the recipe:
+    ## 1. If "ingred" is mentioned in question and ("list", "show") and "step" also mentioned -> the output will show ingredients mentioned in step
+    ## 2. If ("convert" and "temp") or ("what is it in" and "cels"\"far"\"C"\"F") mentioned in qestion -> the output will show converted temperature
+    ## 3. If ("convert" and "size") or ("what is it in" and "inch"\"cm"\"cent") mentioned in qestion -> the output will show converted sizes
+    ## 
+    # ; etc
     # what temperature
 
-    elif("ingredient in the" in input_str and instruction):
+    elif("ingred" in input_str and  # show ingredients used in this step
+         ("list" in input_str or "show" in input_str) and 
+         "step" in input_str):
         print("These are the ingredients used in this step")
         extr_ingr = exact_ingredient_extraction(instruction)
-        output= '\n'.join(extr_ingr) if len(extr_ingr) > 0 else "No ingredients mentioned"
+        output='\n'.join(extr_ingr) \
+            if len(extr_ingr) > 0 \
+                else "No ingredients mentioned"
+    elif("convert" in input_str and "temp" in input_str) \
+        or ("what is it in" in input_str \
+            and ("cels" in input_str or "far" in input_str \
+                 or "c" in input_str.split() or "f" in input_str.split())):   # convertion questions for C <-> F
+        f_temp_pattern = r'\b(\d+)\s*(?:degree\s*)?[Ff]\b'
+        c_temp_pattern = r'\b(\d+)\s*(?:degree\s*)?[Cc]\b'
+
+        match_f = re.findall(f_temp_pattern, instruction)
+        match_c = re.findall(c_temp_pattern, instruction)
+        units = ['F', 'C']
+        new_units = ['C', 'F']
+        converters = [(lambda x: (x - 32) * 5 / 9), (lambda x: x * 9 / 5 + 32)]
+        output = ''
+
+        for matches, unit, new_unit, converter in zip([match_f, match_c], units, new_units, converters):
+            for m in matches:
+                cur_temp = float(m)
+                new_temp = converter(cur_temp)
+                output += f'The mentioned temperature of \
+                        {cur_temp} {unit} can be converted to {new_temp} {new_unit}\n'
+        if len(output) < 1: output = f'No temperatre mentioned in the step'
+    elif("convert" in input_str and "size" in input_str) \
+        or ("what is it in" in input_str \
+            and ("inch" in input_str or "cm" in input_str or "cent" in input_str)):   # convertion questions for inch <-> cm
+        pat_numbers = re.findall(r'\d+(?:\.\d+)?(?:/\d+)?', instruction)
+        numbers = []
+        for number in pat_numbers:
+            if '/' in number: numbers.append(float(Fraction(number)))
+            elif '.' in number: numbers.append(float(number))
+            else: numbers.append(float(number))
+        unit = ''
+        new_unit = ''
+        conv = 0
+        if 'cm' in instruction.split():
+            conv = 0.3937
+            unit = 'cm'
+            new_unit = 'in'
+        if "inch" in instruction.split():
+            conv = 2.54
+            unit = 'in'
+            new_unit = 'cm'
+        if conv == 0:
+            output = "No mentions of size in the step"
+        else:
+            for number in numbers:
+                output += f'The mentioned size of \
+                        {number} {unit} can be converted to {number * conv} {new_unit}\n'
+
+
+
     #vague questions
     elif("what is that" in input_str):
         pass
