@@ -51,8 +51,8 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
         or ("what is it in" in input_str \
             and ("cels" in input_str or "far" in input_str \
                  or "c" in input_str.split() or "f" in input_str.split())):   # convertion questions for C <-> F
-        f_temp_pattern = r'\b(\d+)\s*(?:degree\s*)?[Ff]\b'
-        c_temp_pattern = r'\b(\d+)\s*(?:degree\s*)?[Cc]\b'
+        f_temp_pattern = r'\b(\d+)\s*(?:degree[s]\s*)?[Ff]\b'
+        c_temp_pattern = r'\b(\d+)\s*(?:degree[s]\s*)?[Cc]\b'
 
         match_f = re.findall(f_temp_pattern, instruction)
         match_c = re.findall(c_temp_pattern, instruction)
@@ -65,8 +65,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
             for m in matches:
                 cur_temp = float(m)
                 new_temp = converter(cur_temp)
-                output += f'The mentioned temperature of \
-                        {cur_temp} {unit} can be converted to {new_temp} {new_unit}\n'
+                output += f'The mentioned temperature of {cur_temp} {unit} can be converted to {new_temp} {new_unit}\n'
         if len(output) < 1: output = f'No temperatre mentioned in the step'
     elif("convert" in input_str and "size" in input_str) \
         or ("what is it in" in input_str \
@@ -80,6 +79,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
         unit = ''
         new_unit = ''
         conv = 0
+        output = ''
         if 'cm' in instruction.split():
             conv = 0.3937
             unit = 'cm'
@@ -92,8 +92,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
             output = "No mentions of size in the step"
         else:
             for number in numbers:
-                output += f'The mentioned size of \
-                        {number} {unit} can be converted to {number * conv} {new_unit}\n'
+                output += f'The mentioned size of  {number} {unit} can be converted to {number * conv} {new_unit}\n'
 
 
 
@@ -140,7 +139,7 @@ def session():
     while(True):
         print(f'{instr_ptr+1}: {instructions[instr_ptr]["text"]}')
         input_str = input(":")
-        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, instructions[instr_ptr])
+        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, instructions[instr_ptr]["text"])
         print(f'{output}')
     
     
