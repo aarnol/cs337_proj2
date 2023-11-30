@@ -16,10 +16,11 @@ def google_search_query(query,youtube = False):
         search_url = f'https://www.google.com/search?q={query}'
     return search_url
 
-def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredients=None):
-    instruction = instruction['text']
-    items = instruction['ingredients'] + instruction['tools']
-    actions = instruction['action']
+def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingredients=None):
+    instruction = instruction_full['text']
+    items = instruction_full['ingredients'] + instruction_full['tools']
+    print(instruction_full['ingredients'])
+    actions = instruction_full['action']
     output = None
     skip_pattern = r'\bgo to step (\d+)\b'
     skip_pattern = r'\bto step (\d+)\b' # so that it would also take patter "take me to" not only "go to"
@@ -48,12 +49,13 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredient
          ("list" in input_str or "show" in input_str) and 
          "step" in input_str):
         print("These are the ingredients used in this step")
+        # print(ingredients, instruction) #debug
         ingred_names = [ingredients[t]['name'] for t in ingredients]
         extr_ingr = []
         for id, i in enumerate(ingred_names):
             ingred_present = False
             for w in i.split(' '):
-                if w in instruction: ingred_present = True
+                if w in instruction.lower(): ingred_present = True
                 if ingred_present: break
             if ingred_present: extr_ingr.append(i)
         output='\n'.join(extr_ingr) \
@@ -66,8 +68,8 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredient
         f_temp_pattern = r'\b(\d+)\s*(?:degree[s]\s*)?[Ff]\b'
         c_temp_pattern = r'\b(\d+)\s*(?:degree[s]\s*)?[Cc]\b'
 
-        match_f = re.findall(f_temp_pattern, instruction)
-        match_c = re.findall(c_temp_pattern, instruction)
+        match_f = re.findall(f_temp_pattern, instruction.lower())
+        match_c = re.findall(c_temp_pattern, instruction.lower())
         units = ['F', 'C']
         new_units = ['C', 'F']
         converters = [(lambda x: (x - 32) * 5 / 9), (lambda x: x * 9 / 5 + 32)]
@@ -82,7 +84,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredient
     elif("convert" in input_str and "size" in input_str) \
         or ("what is it in" in input_str \
             and ("inch" in input_str or "cm" in input_str or "cent" in input_str)):   # convertion questions for inch <-> cm
-        pat_numbers = re.findall(r'\d+(?:\.\d+)?(?:/\d+)?', instruction)
+        pat_numbers = re.findall(r'\d+(?:\.\d+)?(?:/\d+)?', instruction.lower())
         numbers = []
         for number in pat_numbers:
             if '/' in number: numbers.append(float(Fraction(number)))
@@ -92,11 +94,11 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredient
         new_unit = ''
         conv = 0
         output = ''
-        if 'cm' in instruction.split():
+        if 'cm' in instruction.lower().split():
             conv = 0.3937
             unit = 'cm'
             new_unit = 'in'
-        if "inch" in instruction.split():
+        if "inch" in instruction.lower().split():
             conv = 2.54
             unit = 'in'
             new_unit = 'cm'
@@ -184,7 +186,7 @@ def session():
         print(f'{instr_ptr+1}: {instructions[instr_ptr]["text"]}')
         input_str = input(":")
         instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, 
-                                                       instructions[instr_ptr]["text"], 
+                                                       instructions[instr_ptr], 
                                                        separated_ingredients)
         print(f'{output}')
     
