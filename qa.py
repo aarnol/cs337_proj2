@@ -4,6 +4,7 @@ import re
 from fractions import Fraction
 
 from lists import ingredients as presaved_ingredients
+from separate import get_ingredients_from_one_item as get_ingred
 
 
 def google_search_query(query,youtube = False):
@@ -15,7 +16,7 @@ def google_search_query(query,youtube = False):
         search_url = f'https://www.google.com/search?q={query}'
     return search_url
 
-def parse_question(input_str,instr_ptr, last_input, instruction=None):
+def parse_question(input_str,instr_ptr, last_input, instruction=None, ingredients=None):
     output = None
     skip_pattern = r'\bgo to step (\d+)\b'
     skip_pattern = r'\bto step (\d+)\b' # so that it would also take patter "take me to" not only "go to"
@@ -35,15 +36,23 @@ def parse_question(input_str,instr_ptr, last_input, instruction=None):
     ## 1. If "ingred" is mentioned in question and ("list", "show") and "step" also mentioned -> the output will show ingredients mentioned in step
     ## 2. If ("convert" and "temp") or ("what is it in" and "cels"\"far"\"C"\"F") mentioned in qestion -> the output will show converted temperature
     ## 3. If ("convert" and "size") or ("what is it in" and "inch"\"cm"\"cent") mentioned in qestion -> the output will show converted sizes
-    ## 
+    ## 4. ToDo "How much of ..."
+    ## 5. ToDo "When was used ..."
     # ; etc
-    # what temperature
+    # list ingred step
 
     elif("ingred" in input_str and  # show ingredients used in this step
          ("list" in input_str or "show" in input_str) and 
          "step" in input_str):
         print("These are the ingredients used in this step")
-        extr_ingr = exact_ingredient_extraction(instruction)
+        ingred_names = [ingredients[t]['name'] for t in ingredients]
+        extr_ingr = []
+        for id, i in enumerate(ingred_names):
+            ingred_present = False
+            for w in i.split(' '):
+                if w in instruction: ingred_present = True
+                if ingred_present: break
+            if ingred_present: extr_ingr.append(i)
         output='\n'.join(extr_ingr) \
             if len(extr_ingr) > 0 \
                 else "No ingredients mentioned"
@@ -112,13 +121,18 @@ def exact_ingredient_extraction(ingredients_el):
     return [t.replace('_', ' ') for t in presaved_ingredients if t.replace('_', ' ') in ingredients_el]
 
 def session():
-    url = input("Please type the URL of the recipe: ")
+    url = input("Please type the URL of the recipe: ") 
+    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
     recipe = get_recipe_info(url)
     title = recipe['title']
     ingredients = recipe['ingredients']
+    separated_ingredients = {} # it will have structure: {ingredients[i]: {"name": extracted_name, "info": {"amount":..., "measure":..., "prep":...}, "used_in_step":...}
+    for element in ingredients:
+        ingred_info, name = get_ingred(element)
+        separated_ingredients[element] = {"name": name, "info": ingred_info, "used_in_step":0}
     # exact_ingredient = [exact_ingredient_extraction(el) for el in ingredients]
     instructions = recipe['instructions']
-    info = get_recipe_info(url)
+    # info = get_recipe_info(url)
     instructions = process_instructions(instructions,recipe)
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
@@ -139,7 +153,9 @@ def session():
     while(True):
         print(f'{instr_ptr+1}: {instructions[instr_ptr]["text"]}')
         input_str = input(":")
-        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, instructions[instr_ptr]["text"])
+        instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, 
+                                                       instructions[instr_ptr]["text"], 
+                                                       separated_ingredients)
         print(f'{output}')
     
     

@@ -33,44 +33,48 @@ def extract_amount(text):
     if len(cur_match) > 0: all_matches.append(''.join(cur_match))
     return all_matches, non_amount_info.strip()
 
+def get_ingredients_from_one_item(item):
+    # Get instructions in brackets
+    additional_measure = None
+    match = re.search(r'\((.*?)\)', item)
+    if match:
+        additional_measure = match.group(1)
+    # Remove brackets content
+    item = re.sub(r'\([^)]*\)', '', item)
+    # Remove punctuation
+    ingredient_name_str = item.split(',')[0]
+    item = re.sub(r'[^\w\s/.,]', ' ', item)
+    # Get verbs
+    words = word_tokenize(item)
+    pos_tags = pos_tag(words)
+    actions = [word for word, pos in pos_tags if pos.startswith('VB')]
+    # Get amounts and measure types
+    amounts, _ = extract_amount(item)
+    _, ingredient_name_str = extract_amount(ingredient_name_str) # remove amounts
+    measures = measure_pattern.search(item)
+    if measures: measures = measures.group()
+    else: measures = []
+    # Remove particles
+    ingredient_name_str = re.sub(r'and ', '', ingredient_name_str)
+    # Remove the measures and actions from the string 
+    ingredient_list = []
+    for word in ingredient_name_str.split():
+        if word in measures or word == measures or word in actions: continue
+        ingredient_list.append(word)
+    ingredient_name = ' '.join(ingredient_list)
+    
+    amount = amounts[0] if len(amounts) > 0 else None
+    measure = measures if len(measures) > 0 else None
+    return {'amount': amount, 'measure': measure, 'prep': actions}, ingredient_name
+    # print('Initial:', item, '\n', 'Ingredienet name:', ingredient_name, '   ->   ',
+    #       ingredients_dict[ingredient_name], '\n', '--' * 8)
+
 def get_ingredients(recipe_info):
     # ingredients: {'amount':    ,'measure':   , 'prep':   }
     ingredients_dict = {}
     for item in recipe_info['ingredients']:
-        # Get instructions in brackets
-        additional_measure = None
-        match = re.search(r'\((.*?)\)', item)
-        if match:
-            additional_measure = match.group(1)
-        # Remove brackets content
-        item = re.sub(r'\([^)]*\)', '', item)
-        # Remove punctuation
-        ingredient_name_str = item.split(',')[0]
-        item = re.sub(r'[^\w\s/.,]', ' ', item)
-        # Get verbs
-        words = word_tokenize(item)
-        pos_tags = pos_tag(words)
-        actions = [word for word, pos in pos_tags if pos.startswith('VB')]
-        # Get amounts and measure types
-        amounts, _ = extract_amount(item)
-        _, ingredient_name_str = extract_amount(ingredient_name_str) # remove amounts
-        measures = measure_pattern.search(item)
-        if measures: measures = measures.group()
-        else: measures = []
-        # Remove particles
-        ingredient_name_str = re.sub(r'and ', '', ingredient_name_str)
-        # Remove the measures and actions from the string 
-        ingredient_list = []
-        for word in ingredient_name_str.split():
-            if word in measures or word == measures or word in actions: continue
-            ingredient_list.append(word)
-        ingredient_name = ' '.join(ingredient_list)
-        
-        amount = amounts[0] if len(amounts) > 0 else None
-        measure = measures if len(measures) > 0 else None
-        ingredients_dict[ingredient_name] = {'amount': amount,
-                                             'measure': measure,
-                                             'prep': actions}
+        item_ingred, ingredient_name = get_ingredients_from_one_item(item)
+        ingredients_dict[ingredient_name] = item_ingred
         # print('Initial:', item, '\n', 'Ingredienet name:', ingredient_name, '   ->   ',
         #       ingredients_dict[ingredient_name], '\n', '--' * 8)
     return ingredients_dict

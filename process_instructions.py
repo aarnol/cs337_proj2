@@ -54,7 +54,7 @@ def process_instructions(instructions_list, recipe_info):
         current_instruction['action'] = actions
         if(len(current_instruction['action']) < 1):
             possible_actions = [verb for verb in lists.cooking_verbs if re.search(verb, instruction, re.IGNORECASE)]
-            print(f'actions = {possible_actions}')
+            # print(f'actions = {possible_actions}')
             if(len(possible_actions) > 0):
                 current_instruction['action'] +=possible_actions
         # Check if the ingredient is in the ingredients dictionary, if it is, add it to the ingredients list.
