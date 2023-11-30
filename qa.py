@@ -19,7 +19,7 @@ def google_search_query(query,youtube = False):
 def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingredients=None):
     instruction = instruction_full['text']
     items = instruction_full['ingredients'] + instruction_full['tools']
-    print(instruction_full['ingredients'])
+    # print(instruction_full['ingredients'])
     actions = instruction_full['action']
     output = None
     skip_pattern = r'\bgo to step (\d+)\b'
@@ -48,7 +48,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
     elif("ingred" in input_str and  # show ingredients used in this step
          ("list" in input_str or "show" in input_str) and 
          "step" in input_str):
-        print("These are the ingredients used in this step")
+        print("These are the ingredients used in this step:")
         # print(ingredients, instruction) #debug
         ingred_names = [ingredients[t]['name'] for t in ingredients]
         extr_ingr = []
@@ -57,7 +57,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
             for w in i.split(' '):
                 if w in instruction.lower(): ingred_present = True
                 if ingred_present: break
-            if ingred_present: extr_ingr.append(i)
+            if ingred_present: extr_ingr.append(f'✦  {i}')
         output='\n'.join(extr_ingr) \
             if len(extr_ingr) > 0 \
                 else "No ingredients mentioned"
@@ -176,7 +176,7 @@ def session():
             break
         else:
             for element in ingredients:
-                print(f'✦  {element}')
+                print(f'✧  {element}') #✧ - not used; ✦ - used
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             # print(ingredients)
             break
