@@ -1,5 +1,8 @@
 from qa import google_search_query
 import re
+from scrape import get_recipe_info
+from process_instructions import process_instructions
+
 meat_subs = {
     "chicken": {"substitute": "tofu", "proportion": None},
     "beef": {"substitute": "black beans", "proportion": ('cup', 'pound')},
@@ -22,28 +25,25 @@ meat_subs = {
     "anchovies": {"substitute": "nori seaweed strips", "proportion": None},
 }
 
-def veggify(proccessed_instructions, ingredients_dict):
-    new_ingredients = {}
-    for ingredient in ingredients_dict.keys():
-        for key in meat_subs.keys():
-            if key in ingredient:
-                if(meat_subs['key']['proportion'] == None):
-                    measure =ingredients_dict[ingredient]['measure']
-                elif meat_subs['key']['proportion'][1] in ingredients_dict[ingredient]['measure']:
-                    measure = meat_subs['key']['proportion'] + "s"
-                else:
-                    print("Could not verify measurements, but I've provided a helpful link to make the substitution correct")
-                    print(google_search_query(f'ratio between {key} and {ingredient}'))
-                    measure = "unknown"
-                amount= ingredients_dict[ingredient]['amount']
-                prep = ingredients_dict[ingredient]['prep']
-                new_ingredients[meat_subs[key]['substitute']] = {'amount' :amount , 'measure':measure, "prep":prep}
+def veggify(proccessed_instructions, ingredients):
     for key in meat_subs.keys():
         for i in range(len(proccessed_instructions)):
-            proccessed_instructions[i]['ingredients'] = [re.sub(meat_subs[key]['substitute'],key, ingred) \
+            proccessed_instructions[i]['ingredients'] = [re.sub(key,meat_subs[key]['substitute'], ingred) \
                                                             for ingred in proccessed_instructions[i]['ingredients']]
-            proccessed_instructions[i]['text'] = re.sub(meat_subs[key]['substitute'],key, proccessed_instructions[i]['text'])
-    return proccessed_instructions, ingredients_dict
-    
-    
+            proccessed_instructions[i]['text'] = re.sub(key, meat_subs[key]['substitute'],proccessed_instructions[i]['text'])
+        ingredients = [re.sub(f"{key} (.*)",meat_subs[key]['substitute'], x) for x in ingredients] # need to change once we parse ingredients?
+    return proccessed_instructions, ingredients
 
+    
+if __name__ == "__main__":
+    url = 'https://www.foodnetwork.com/recipes/food-network-kitchen/the-best-chicken-noodle-soup-7194859' #DEBUG
+    recipe = get_recipe_info(url)
+    instructions  = recipe['instructions']
+    ingredients = recipe['ingredients']
+    print(ingredients)
+    processed = process_instructions(instructions,recipe)
+    print(processed)
+    new_instr, new_dict = veggify(processed,ingredients)
+    print("NEW")
+    print(new_instr)
+    print(new_dict)

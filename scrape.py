@@ -30,14 +30,16 @@ def get_recipe_info(url):
     pattern = r'[0-9]'
 
     ingredients = ingredients[1:]
+    ingredients = [x.replace(u"\xa0", u" ") for x in ingredients]
     # Find and extract the cooking instructions
     instructions = []
     instruction_list = soup.find_all('li', class_='o-Method__m-Step')
-
+    
     for step in instruction_list:
         step = step.next
         pattern = "^([^A-Za-z]*)"
-        instructions.append(re.sub(pattern, "", step))
+        
+        instructions.append(re.sub(pattern, "", step).replace(u"\xa0", u" "))
 
     return {
         'title': recipe_title,
