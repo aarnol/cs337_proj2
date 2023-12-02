@@ -41,7 +41,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
     ## 2. If ("convert" and "temp") or ("what is it in" and "cels"\"far"\"C"\"F") mentioned in question -> the output will show converted temperature
     ## 3. If ("convert" and "size") or ("what is it in" and "inch"\"cm"\"cent") mentioned in question -> the output will show converted sizes
     ## 4. if "how much of" is mentioned -> the output will show all measures and amounts of ingredients that were mentioned in the question
-    ## 5. ToDo "When was used ..."
+    ## 5. if "When was used" is mentioned -> the output will show in which steps were used ingredients that were mentioned in the question
     # ; etc
     # list ingred step
 
