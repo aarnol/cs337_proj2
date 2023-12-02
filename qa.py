@@ -111,27 +111,26 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
         ingred_names = [ingredients[t]['name'] for t in ingredients]
         ingred_amounts = {ingredients[t]['name']:ingredients[t]['info'] for t in ingredients}
         extr_ingr = []
-        ingred_amounts = []
         for id, i in enumerate(ingred_names):
             ingred_present = False
             for w in i.split(' '):
                 if w in input_str: ingred_present = True
                 if ingred_present: break
             if ingred_present: extr_ingr.append(f'✦  {i} - {ingred_amounts[i]["amount"]} {ingred_amounts[i]["measure"]}')
-        output = '\n'.join(["The are the measures for the ingredients you mentioned:"] + extr_ingr)
-    elif("how much of" in input_str):
+        output = '\n'.join(["These are the measures for the ingredients you mentioned:"] + extr_ingr) \
+            if len(extr_ingr) > 0 else 'No ingredients mentioned'
+    elif("when was used" in input_str):
         ingred_names = [ingredients[t]['name'] for t in ingredients]
-        ingred_amounts = {ingredients[t]['name']:ingredients[t]['info'] for t in ingredients}
+        ingred_usage = {ingredients[t]['name']:ingredients[t]['used_in_step'] for t in ingredients}
         extr_ingr = []
-        ingred_amounts = []
         for id, i in enumerate(ingred_names):
             ingred_present = False
             for w in i.split(' '):
                 if w in input_str: ingred_present = True
                 if ingred_present: break
-            if ingred_present: extr_ingr.append(f'✦  {i} - {ingred_amounts[i]["amount"]} {ingred_amounts[i]["measure"]}')
-        output = '\n'.join(["The are the measures for the ingredients you mentioned:"] + extr_ingr)
-    ## 5. ToDo "When was used ..."
+            if ingred_present: extr_ingr.append(f'✦  {i} - used in steps: {", ".join([str(t) for t in ingred_usage[i]])}')
+        output = '\n'.join(["The are the steps ingredients you mentioned were used in:"] + extr_ingr) \
+            if len(extr_ingr) > 0 else 'No ingredients mentioned'
 
 
     #vague questions
@@ -179,19 +178,29 @@ def exact_ingredient_extraction(ingredients_el):
     return [t.replace('_', ' ') for t in presaved_ingredients if t.replace('_', ' ') in ingredients_el]
 
 def session():
-    url = input("Please type the URL of the recipe: ") 
-    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
+    # url = input("Please type the URL of the recipe: ") 
+    url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
     recipe = get_recipe_info(url)
     title = recipe['title']
     ingredients = recipe['ingredients']
     separated_ingredients = {} # it will have structure: {ingredients[i]: {"name": extracted_name, "info": {"amount":..., "measure":..., "prep":...}, "used_in_step":...}
-    for element in ingredients:
-        ingred_info, name = get_ingred(element)
-        separated_ingredients[element] = {"name": name, "info": ingred_info, "used_in_step":0}
+    
     # exact_ingredient = [exact_ingredient_extraction(el) for el in ingredients]
     instructions = recipe['instructions']
     # info = get_recipe_info(url)
     instructions = process_instructions(instructions,recipe)
+    for element in ingredients:
+        ingred_info, name = get_ingred(element)
+        separated_ingredients[element] = {"name": name, "info": ingred_info, "used_in_step":[]}
+        tmp = []
+        for instr_step_id in range(len(instructions)):
+            instr_step = instructions[instr_step_id]['text']
+            ingred_present = False
+            for w in name.split(' '):
+                if w in instr_step.lower(): ingred_present = True
+                if ingred_present: break
+            if ingred_present: tmp.append(instr_step_id + 1)
+        separated_ingredients[element]['used_in_step'] = tmp
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
         choice = input('[1] Recipes or [2] Ingredients: ')
