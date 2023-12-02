@@ -38,9 +38,9 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
         new_ptr = int(match) - 1
     #Specific questions about the recipe:
     ## 1. If "ingred" is mentioned in question and ("list", "show") and "step" also mentioned -> the output will show ingredients mentioned in step
-    ## 2. If ("convert" and "temp") or ("what is it in" and "cels"\"far"\"C"\"F") mentioned in qestion -> the output will show converted temperature
-    ## 3. If ("convert" and "size") or ("what is it in" and "inch"\"cm"\"cent") mentioned in qestion -> the output will show converted sizes
-    ## 4. ToDo "How much of ..."
+    ## 2. If ("convert" and "temp") or ("what is it in" and "cels"\"far"\"C"\"F") mentioned in question -> the output will show converted temperature
+    ## 3. If ("convert" and "size") or ("what is it in" and "inch"\"cm"\"cent") mentioned in question -> the output will show converted sizes
+    ## 4. if "how much of" is mentioned -> the output will show all measures and amounts of ingredients that were mentioned in the question
     ## 5. ToDo "When was used ..."
     # ; etc
     # list ingred step
@@ -107,7 +107,31 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
         else:
             for number in numbers:
                 output += f'The mentioned size of  {number} {unit} can be converted to {number * conv} {new_unit}\n'
-
+    elif("how much of" in input_str):
+        ingred_names = [ingredients[t]['name'] for t in ingredients]
+        ingred_amounts = {ingredients[t]['name']:ingredients[t]['info'] for t in ingredients}
+        extr_ingr = []
+        ingred_amounts = []
+        for id, i in enumerate(ingred_names):
+            ingred_present = False
+            for w in i.split(' '):
+                if w in input_str: ingred_present = True
+                if ingred_present: break
+            if ingred_present: extr_ingr.append(f'✦  {i} - {ingred_amounts[i]["amount"]} {ingred_amounts[i]["measure"]}')
+        output = '\n'.join(["The are the measures for the ingredients you mentioned:"] + extr_ingr)
+    elif("how much of" in input_str):
+        ingred_names = [ingredients[t]['name'] for t in ingredients]
+        ingred_amounts = {ingredients[t]['name']:ingredients[t]['info'] for t in ingredients}
+        extr_ingr = []
+        ingred_amounts = []
+        for id, i in enumerate(ingred_names):
+            ingred_present = False
+            for w in i.split(' '):
+                if w in input_str: ingred_present = True
+                if ingred_present: break
+            if ingred_present: extr_ingr.append(f'✦  {i} - {ingred_amounts[i]["amount"]} {ingred_amounts[i]["measure"]}')
+        output = '\n'.join(["The are the measures for the ingredients you mentioned:"] + extr_ingr)
+    ## 5. ToDo "When was used ..."
 
 
     #vague questions
