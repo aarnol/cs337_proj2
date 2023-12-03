@@ -3,11 +3,11 @@ import os
 import lists
 import nltk
 from nltk import pos_tag, word_tokenize
-import spacy
+
 from scrape import get_recipe_info
 from separate import get_ingredients
 
-pos_tagger = spacy.load("en_core_web_sm")
+
 nltk.download('punkt')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
