@@ -2,19 +2,14 @@ from scrape import get_recipe_info
 from process_instructions import process_instructions
 import re
 from fractions import Fraction
-
+from utils import google_search_query
+from lists import health_subs, meat_subs
 from lists import ingredients as presaved_ingredients
 from separate import get_ingredients_from_one_item as get_ingred
+from transformation import transform
 
 
-def google_search_query(query,youtube = False):
-    
-    query = query.replace(' ', '+')
-    if(youtube):
-        search_url = f'https://www.youtube.com/results?search_query={query}'
-    else:
-        search_url = f'https://www.google.com/search?q={query}'
-    return search_url
+
 
 def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingredients=None):
     instruction = instruction_full['text']
@@ -26,6 +21,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
     skip_pattern = r'\bto step (\d+)\b' # so that it would also take patter "take me to" not only "go to"
     input_str = input_str.lower()
     new_ptr = instr_ptr
+    output = ''
     #navigation
     if("repeat" in input_str):
         pass
@@ -61,6 +57,14 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
         output='\n'.join(extr_ingr) \
             if len(extr_ingr) > 0 \
                 else "No ingredients mentioned"
+    elif("ingred" in input_str and 'list' in input_str):
+        for key in ingredients.keys():
+            if(ingredients[key]['info']['measure']):
+                measure = ingredients[key]['info']['measure']
+            else:
+                measure = ''
+            print(f'✧ {ingredients[key]['info']['amount']} {measure} {ingredients[key]['name']}') #✧ - not used; ✦ - used
+            
     elif("convert" in input_str and "temp" in input_str) \
         or ("what is it in" in input_str \
             and ("cels" in input_str or "far" in input_str \
@@ -107,7 +111,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
         else:
             for number in numbers:
                 output += f'The mentioned size of  {number} {unit} can be converted to {number * conv} {new_unit}\n'
-    elif("how much of" in input_str):
+    elif("how much" in input_str):
         ingred_names = [ingredients[t]['name'] for t in ingredients]
         ingred_amounts = {ingredients[t]['name']:ingredients[t]['info'] for t in ingredients}
         extr_ingr = []
@@ -162,6 +166,8 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
                     continue
             if not found:
                 output = 'I can not figure out what you mean, please be more specific'
+   
+    
 
 
 
@@ -171,24 +177,24 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
     elif("how do" in input_str):
         print("I'm not sure, but here is a google link that might help.")
         output = google_search_query(input_str,youtube=True)
+    
+    #Transformations
+    elif("healthy" in input_str or "healthier" in input_str):
+        print(f"OK, I will try to replace all some ingredients with healthier alternatives.")
+        print('If you want more information about these new ingredients, ask and I can create a google link that could help!')
+        output ='Making it healthier...'
+    elif("vegetarian" in input_str):
+        print("OK, I will try to replace all the meat with vegetarian alternatives. Keep in mind that these new foods may need to be prepared differently.")
+        print('If you want more information about these new ingredients, ask and I can create a google link that could help!')
+        output ='Making it vegatarian...'
     return new_ptr, input_str, output
     
 
 def exact_ingredient_extraction(ingredients_el):
     return [t.replace('_', ' ') for t in presaved_ingredients if t.replace('_', ' ') in ingredients_el]
-
-def session():
-    # url = input("Please type the URL of the recipe: ") 
-    url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
-    recipe = get_recipe_info(url)
-    title = recipe['title']
-    ingredients = recipe['ingredients']
+def separate_ingredients(ingredients, instructions):
     separated_ingredients = {} # it will have structure: {ingredients[i]: {"name": extracted_name, "info": {"amount":..., "measure":..., "prep":...}, "used_in_step":...}
     
-    # exact_ingredient = [exact_ingredient_extraction(el) for el in ingredients]
-    instructions = recipe['instructions']
-    # info = get_recipe_info(url)
-    instructions = process_instructions(instructions,recipe)
     for element in ingredients:
         ingred_info, name = get_ingred(element)
         separated_ingredients[element] = {"name": name, "info": ingred_info, "used_in_step":[]}
@@ -201,6 +207,19 @@ def session():
                 if ingred_present: break
             if ingred_present: tmp.append(instr_step_id + 1)
         separated_ingredients[element]['used_in_step'] = tmp
+    return separated_ingredients
+def session():
+    url = input("Please type the URL of the recipe: ") 
+    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
+    recipe = get_recipe_info(url)
+    title = recipe['title']
+    ingredients = recipe['ingredients']
+    
+    # exact_ingredient = [exact_ingredient_extraction(el) for el in ingredients]
+    instructions = recipe['instructions']
+    # info = get_recipe_info(url)
+    instructions = process_instructions(instructions,recipe)
+    separated_ingredients = separate_ingredients(ingredients, instructions)
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
         choice = input('[1] Recipes or [2] Ingredients: ')
@@ -208,8 +227,12 @@ def session():
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             break
         else:
-            for element in ingredients:
-                print(f'✧  {element}') #✧ - not used; ✦ - used
+            for key in separated_ingredients.keys():
+                if(separated_ingredients[key]['info']['measure']):
+                    measure = separated_ingredients[key]['info']['measure']
+                else:
+                    measure = ''
+                print(f'✧ {separated_ingredients[key]['info']['amount']} {measure} {separated_ingredients[key]['name']}') #✧ - not used; ✦ - used
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             # print(ingredients)
             break
@@ -217,11 +240,20 @@ def session():
     last_instr = None
     while(True):
         print(f'{instr_ptr+1}: {instructions[instr_ptr]["text"]}')
+        output = ''
         input_str = input(":")
         instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, 
                                                        instructions[instr_ptr], 
                                                        separated_ingredients)
         print(f'{output}')
+        if( 'Making it vegatarian...' in output):
+            instructions, separated_ingredients = transform(instructions, separated_ingredients, meat_subs)
+        elif('Making it healthier...' in output):
+            print('here')
+            instructions, separated_ingredients = transform(instructions, separated_ingredients, health_subs)
+            print(separated_ingredients)
+        
+
     
     
 if __name__ == "__main__":

@@ -28,6 +28,40 @@ common_ingredients  = [
 
 
 ["salt", "pepper", "olive oil", "butter", "garlic", "onion", "tomato", "flour", "sugar", "eggs", "milk", "cream", "cheese", "chicken", "beef", "pork", "fish", "shrimp", "rice", "pasta", "potatoes", "carrots", "bell pepper", "broccoli", "spinach", "lettuce", "cilantro", "parsley", "basil", "thyme", "rosemary", "oregano", "cumin", "coriander", "ginger", "cinnamon", "nutmeg", "vanilla extract", "honey", "soy sauce", "vinegar", "mustard", "ketchup", "mayonnaise", "barbecue sauce", "hot sauce", "Worcestershire sauce", "balsamic vinegar", "red wine vinegar", "white wine vinegar", "maple syrup", "molasses", "coconut milk", "canned tomatoes", "tomato sauce", "tomato paste", "chicken broth", "beef broth", "vegetable broth", "canned beans", "quinoa", "lentils", "nuts", "seeds", "breadcrumbs", "cornstarch", "baking powder", "baking soda", "yeast", "vanilla extract", "chocolate chips", "cocoa powder", "coconut flakes", "nut butter", "jam", "pickles", "mustard", "mayonnaise", "salsa", "ketchup", "barbecue sauce", "sriracha", "tahini", "hoisin sauce", "fish sauce", "sesame oil", "mirin", "rice vinegar", "black beans", "chickpeas", "lentils", "quinoa", "couscous", "bulgur", "farro"]
+health_subs = {
+    "vegetable oil": {"substitute": "coconut oil", 'proportion': None, 'amount':None},
+    "canola oil": {"substitute": "coconut oil", 'proportion': None, 'amount':None },
+    "margarine": {"substitute": "butter", 'proportion': None, 'amount': 0.75 },
+    "sugar": {"substitute": "sugar", 'proportion': None , 'amount':0.5},
+    "white flour": {"substitute": "whole wheat flour", 'proportion': None , 'amount':None},
+    "margarine": {"substitute": "butter", 'proportion': None , 'amount':None},
+    "taco shell": {"substitute": "lettuce", 'proportion': ("leaf", 'shell') , 'amount':None},
+    "cheese": {"substitute": "goat cheese", 'proportion': None , 'amount':0.5},
+    "beef": {"substitute": "pork", "proportion": None, 'amount':None},
+
+}
+
+meat_subs = {
+    "chicken": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "beef": {"substitute": "black beans", "proportion": ('cup', 'pound'), 'amount':None},
+    "pork": {"substitute": "lentils", "proportion": ('cup', 'pound'), 'amount':None},
+    "fish": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "shrimp": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "bacon": {"substitute": "tempeh", "proportion": None, 'amount':None},
+    "sausage": {"substitute": "soy sausage", "proportion": None, 'amount':None},
+    "turkey": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "ham": {"substitute": "jackfruit", "proportion": None, 'amount':None},
+    "lamb": {"substitute": "lentils ", "proportion": ('cup', 'pound'), 'amount':None},
+    "veal": {"substitute": "eggplant", "proportion": ('cup', 'pound'), 'amount':None},
+    "venison": {"substitute": "mushrooms", "proportion": ('cup', 'pound'), 'amount':None},
+    "duck": {"substitute": "seitan", "proportion": ('cup', 'pound'), 'amount':None},
+    "rabbit": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "salmon": {"substitute": "tofu", "proportion": None, 'amount':None},
+    "crab": {"substitute": "jackfruit", "proportion": None, 'amount':None},
+    "lobster": {"substitute": "heart of palm", "proportion": None, 'amount':None},
+    "clams": {"substitute": "oyster mushrooms", "proportion": None, 'amount':None},
+    "anchovies": {"substitute": "nori seaweed strips", "proportion": None, 'amount':None},
+}
 
 
 cooking_verbs = [

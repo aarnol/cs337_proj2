@@ -24,7 +24,7 @@ def process_instructions(instructions_list, recipe_info):
 
     # Retrieve ingredients dictionary
     ingredients_dict = get_ingredients(recipe_info)
-    print(ingredients_dict)
+    
     #lowercase all the instructions
     instructions_list = [instruction.lower() for instruction in instructions_list]
     instructions_list = steps_to_sentences(instructions_list)
