@@ -2,7 +2,7 @@
 
 Before using, install Spacy, NLTK, and BS4 (Beautiful Soup).
 
-To start, run the qa funfile ction and enter a URL to start the program.
+To start, run the qa funfile ction and enter a Food network recipe URL to start the program.
 
 Supported questions:
  Show ingredients list
@@ -32,6 +32,6 @@ Supported questions:
  "how to do that"
 
  "what is" and "how do" questions
- 
+
  vegetarian and healthier transformations
  
