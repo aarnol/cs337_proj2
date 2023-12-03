@@ -32,14 +32,14 @@ def transform(proccessed_instructions, separated_ingredients, transform):
                 if(transform[sub]['amount'] != None):
                     try:
                         amount = int(amount) *transform[sub]['amount']
-                        print('here')
+                        
                     except:
                         amount = Fraction(amount) * transform[sub]['amount']
-                        print('here')
+                        
                         
                         
                 info = {'amount':amount, 'measure': measure, 'prep':info['prep']}
-        new_sep_ingreds[key] = {'name':new_name, 'info':info}
+        new_sep_ingreds[key] = {'name':name, 'info':info}
 
     return proccessed_instructions, new_sep_ingreds
 

@@ -210,7 +210,7 @@ def separate_ingredients(ingredients, instructions):
     return separated_ingredients
 def session():
     url = input("Please type the URL of the recipe: ") 
-    # url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
+    #url = 'https://www.foodnetwork.com/recipes/banana-bread-recipe-1969572' #DEBUG
     recipe = get_recipe_info(url)
     title = recipe['title']
     ingredients = recipe['ingredients']
@@ -249,9 +249,8 @@ def session():
         if( 'Making it vegatarian...' in output):
             instructions, separated_ingredients = transform(instructions, separated_ingredients, meat_subs)
         elif('Making it healthier...' in output):
-            print('here')
             instructions, separated_ingredients = transform(instructions, separated_ingredients, health_subs)
-            print(separated_ingredients)
+            
         
 
     
