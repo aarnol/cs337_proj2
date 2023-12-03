@@ -2,30 +2,32 @@
 
 Before using, install Spacy, NLTK, and BS4 (Beautiful Soup).
 
-To start, run the qa funfile ction and enter a Food network recipe URL to start the program.
+To start, run the qa script and enter the URL of a recipe from the Food Network website to start the program.
 
-Supported questions:
- Show ingredients list
+Input "ingredients" or "2" if you want to see the ingredient list before getting into the recipe steps.
 
- Show ingredients used in a particular step
+ #### Navigational utterances:
 
- Navigational utterances
+  "repeat" - to repeat the current step of instructions
 
-  "repeat"
+  "next"/"continue" - to go to the next step
 
-  "next"/"continue"
+  "back"/"previous" - to repeat previous step
 
-  "back"/"previous"
+  "(go) to step (number)" - to go to the step by the number (number)
 
-  "(go) to step (number)"
+#### Supported questions:
+ Show ingredients list - if you want to see the list of ingredients again
 
- convert temp to C or F
+ Show ingredients used in the current step - if you want to see the ingredients used in the current step
 
- Convert in to cm ("convert size")
+ "Convert temperature" or "What is it in C\F\celsius\fahrenheit" - If you want to convert temperatures mentioned in the current step of instructions 
 
- Ask "how much"
+ "Convert size" - If you want to convert inches to cm and vice versa
 
- "When was used"
+ Ask "how much" of ingredients do you need to use
+
+ "When was used ..." where ... is the ingredient
 
  "what is that"
 
