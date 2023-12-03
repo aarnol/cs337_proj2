@@ -63,7 +63,7 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
                 measure = ingredients[key]['info']['measure']
             else:
                 measure = ''
-            print(f'✧ {ingredients[key]['info']['amount']} {measure} {ingredients[key]['name']}') #✧ - not used; ✦ - used
+            print(f'✧ {ingredients[key]["info"]["amount"]} {measure} {ingredients[key]["name"]}') #✧ - not used; ✦ - used
             
     elif("convert" in input_str and "temp" in input_str) \
         or ("what is it in" in input_str \
@@ -223,7 +223,7 @@ def session():
     print(f'Let\' get started on {title}. How would you like to start?')
     while(True):
         choice = input('[1] Recipes or [2] Ingredients: ')
-        if('ingred' not in choice):
+        if('ingred' not in choice and '2' not in choice):
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             break
         else:
@@ -232,7 +232,7 @@ def session():
                     measure = separated_ingredients[key]['info']['measure']
                 else:
                     measure = ''
-                print(f'✧ {separated_ingredients[key]['info']['amount']} {measure} {separated_ingredients[key]['name']}') #✧ - not used; ✦ - used
+                print(f'✧ {separated_ingredients[key]["info"]["amount"]} {measure} {separated_ingredients[key]["name"]}') #✧ - not used; ✦ - used
             print("Let\' get started with the recipe. When you are ready to go to the next step please input the word 'continue'")
             # print(ingredients)
             break
