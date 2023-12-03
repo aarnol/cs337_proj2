@@ -24,7 +24,7 @@ def process_instructions(instructions_list, recipe_info):
 
     # Retrieve ingredients dictionary
     ingredients_dict = get_ingredients(recipe_info)
-
+    print(ingredients_dict)
     #lowercase all the instructions
     instructions_list = [instruction.lower() for instruction in instructions_list]
     instructions_list = steps_to_sentences(instructions_list)
@@ -61,7 +61,8 @@ def process_instructions(instructions_list, recipe_info):
         for ingredient in ingredients_dict:
             if ingredient in instruction:
                 current_instruction['ingredients'].append(ingredient)
-
+        if(len(current_instruction['ingredients']) == 0):
+            current_instruction['ingredients'] = [x for x in lists.common_ingredients if x in instruction]
         for tool in lists.cooking_tools + lists.cooking_places:
             if tool in instruction:
                 current_instruction['tools'].append(tool)
@@ -79,4 +80,5 @@ if __name__ == '__main__':
 
     if recipe_info:
         instructions = process_instructions(recipe_info['instructions'], recipe_info)
+        print(instructions)
         
