@@ -167,8 +167,10 @@ def parse_question(input_str,instr_ptr, last_input, instruction_full=None, ingre
             if not found:
                 output = 'I can not figure out what you mean, please be more specific'
    
-    
-
+    elif("what tools" in input_str or "what supplies" in input_str):
+        print('You will need the following supplies:')
+        for tool in instruction_full['tools']:
+            print(tool)
 
 
     elif("what is" in input_str):
@@ -244,7 +246,8 @@ def session():
         input_str = input(":")
         instr_ptr, last_instr, output = parse_question(input_str, instr_ptr, last_instr, 
                                                        instructions[instr_ptr], 
-                                                       separated_ingredients)
+                                                       separated_ingredients
+                                                       )
         print(f'{output}')
         if( 'Making it vegatarian...' in output):
             instructions, separated_ingredients = transform(instructions, separated_ingredients, meat_subs)

@@ -5,7 +5,7 @@ Before using, install Spacy, NLTK, and BS4 (Beautiful Soup).
 To start, run the qa script and enter the URL of a recipe from the Food Network website to start the program.
 
 Input "ingredients" or "2" if you want to see the ingredient list before getting into the recipe steps.
-
+how 
  #### Navigational utterances:
 
   "repeat" - to repeat the current step of instructions

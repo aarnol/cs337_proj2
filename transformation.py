@@ -22,10 +22,10 @@ def transform(proccessed_instructions, separated_ingredients, transform):
         measure = info['measure']
         for sub in transform:
             
-            if sub in name:
-                new_name = re.sub(f"{sub} (.*)",transform[sub]['substitute'], name)
-                name = new_name
-                key = re.sub(f"{sub} (.*)",transform[sub]['substitute'], key)
+            if sub in name or sub in key:
+                name = transform[sub]['substitute']
+                
+                key = transform[sub]['substitute']
                 if(transform[sub]['proportion']!= None):
                     if transform[sub]['proportion'][1] in info['measure']:
                         measure = transform[sub]['proportion'][0] + 's'
@@ -39,6 +39,9 @@ def transform(proccessed_instructions, separated_ingredients, transform):
                         
                         
                 info = {'amount':amount, 'measure': measure, 'prep':info['prep']}
+                print(info)
+                print(name)
+                print(key)
         new_sep_ingreds[key] = {'name':name, 'info':info}
 
     return proccessed_instructions, new_sep_ingreds
